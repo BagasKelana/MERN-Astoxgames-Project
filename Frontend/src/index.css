@@ -1,0 +1,145 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    font-family: "Roboto", sans-serif;
+    color: white;
+    background: rgb(15, 15, 15);
+    font-synthesis: none;
+    image-rendering: optimizeQuality;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+}
+p {
+    font-weight: 300;
+    line-height: 22px;
+}
+h1 {
+    font-weight: 700;
+    line-height: 2px;
+}
+h2 {
+    font-weight: 500;
+    line-height: 12px;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+img {
+    -webkit-user-drag: none;
+}
+
+#side-bar::-webkit-scrollbar {
+    display: none;
+}
+label {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none;
+}
+#login,
+#signin {
+    border-top: 1px solid rgba(255, 49, 49, 0.5);
+    border-right: 1px solid rgba(0, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(57, 255, 20, 0.5);
+    border-left: 1px solid rgba(255, 255, 113, 0.5);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    border: none;
+    -webkit-text-fill-color: black;
+    -webkit-box-shadow: none;
+    background-color: transparent;
+    background: transparent;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.navbar,
+ul {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none;
+}
+/* * {
+    transition: all 0.2s ease-out;
+} */
+
+.main-section {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-top: 2rem;
+    height: full;
+    width: full;
+    gap: 2rem;
+}
+
+@layer components {
+    .main_list_games {
+        @apply rounded bg-gradient-to-tl from-sky-800 to-sky-500 px-4 py-2 shadow shadow-black;
+    }
+    .main_bg {
+        @apply bg-gradient-to-br from-[#363636] to-[#121212];
+    }
+}
+
+.scrollbar-container::-webkit-scrollbar {
+    background-color: transparent;
+
+    height: 13px;
+}
+.scrollbar-container::-webkit-scrollbar-thumb {
+    background-color: rgb(89, 89, 89); /* Warna thumb scrollbar */
+    border-radius: 100px; /* Bentuk sudut thumb scrollbar */
+}
+
+.scrollbar-container::-webkit-scrollbar-thumb:hover {
+    background-color: white; /* Warna thumb scrollbar */
+    border-radius: 100px; /* Bentuk sudut thumb scrollbar */
+}
+
+/* Untuk track scrollbar */
+.scrollbar-container::-webkit-scrollbar-track {
+    background-color: transparenta;
+    /* Warna track scrollbar */
+}
+
+/* Untuk corner scrollbar (hanya di Chrome) */
+.scrollbar-container::-webkit-scrollbar-corner {
+    background-color: #f1f1f1; /* Warna corner scrollbar */
+}
+
+.active_scrollbar_gamedetail {
+    border: 7px inset #ff5c48;
+}
+
+#top-game-card * {
+    transition: all 0.2s ease-out;
+}
+
+.body-screen {
+    display: block;
+    height: 100vh;
+    overflow: hidden;
+}
