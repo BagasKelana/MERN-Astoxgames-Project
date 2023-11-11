@@ -66,7 +66,7 @@ const storage = multer.diskStorage({
 	},
 })
 
-const upload = multer({ storage: storage }) 
+const upload = multer({ storage: storage })
 
 app.post("/upload", upload.array("images", 12), function (req, res, next) {
 	try {
@@ -85,10 +85,12 @@ app.post("/upload", upload.array("images", 12), function (req, res, next) {
 			"image/png",
 			"image/gif",
 			"image/webp",
+			"image/jpg",
 		]
 
 		for (let i = 0; i < req.files.length; i++) {
-			if (allowedImageTypes.includes(req.files[i].mimetype)) {
+			console.log(req.files[i].path)
+			if (!allowedImageTypes.includes(req.files[i].mimetype)) {
 				responseFail.push(path.relative("public", req.files[i].path))
 			} else {
 				responseSuccess.push(path.relative("public", req.files[i].path))
