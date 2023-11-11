@@ -1,9 +1,9 @@
 import { useState } from "react"
-import useFetch from "@/hook/useFetch" 
-import SideImg from "./SideImg" 
+import useFetch from "@/hook/useFetch"
+import SideImg from "./SideImg"
 
 const Hero = () => {
-    const { data } = useFetch(`http://localhost:3000/games/added?limit=6`)
+    const { data } = useFetch(`/api/games/added?limit=6`)
 
     const [showMainImg, setShowMainImg] = useState([
         true,
@@ -21,7 +21,7 @@ const Hero = () => {
         setShowMainImg(
             showMainImg.map((data, i) => {
                 return +i === +index ? (data = true) : (data = false)
-            })
+            }),
         )
         setSrcMainIMg(index)
     }

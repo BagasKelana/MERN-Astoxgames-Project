@@ -1,5 +1,5 @@
 import { memo, useState } from "react"
-import useFetch from "../../hook/useFetch"
+import useFetch from "@/hook/useFetch"
 import SmallGameCard from "../Card/SmallGameCard"
 
 const HomeCardsContent = memo(function HomeCardsContent({ urlBy }) {
@@ -16,13 +16,11 @@ const HomeCardsContent = memo(function HomeCardsContent({ urlBy }) {
         false,
     ])
 
-    const { data, loading } = useFetch(
-        `${import.meta.env.VITE_REACT_APP_DEV_MODE}/games/${urlBy}?limit=10`
-    )
+    const { data, loading } = useFetch(`/api/games/${urlBy}?limit=10`)
 
     const handleOnMouseEnter = (index) => {
         setCardActive(
-            cardActive.map((v, i) => (i === index ? (v = true) : (v = false)))
+            cardActive.map((v, i) => (i === index ? (v = true) : (v = false))),
         )
     }
     return (
@@ -43,77 +41,74 @@ const HomeCardsContent = memo(function HomeCardsContent({ urlBy }) {
                     )
                 })}
             </div>
-            <div
-                className={` hidden h-[832px] w-1/4 flex-col gap-2 bg-gradient-to-r from-gray-700 to-gray-800  px-2 py-4 xl:flex `}
-            >
-                {!loading &&
-                    cardActive.map((v, i) => {
-                        return (
-                            v && (
-                                <>
-                                    <div className="flex h-[160px] w-full flex-col gap-2">
-                                        <div className="mb-2 flex w-full text-xl font-bold">
-                                            {data[i].name}
+            {!loading &&
+                cardActive.map((v, i) => {
+                    return (
+                        v && (
+                            <div
+                                key={data[i]._id}
+                                className={` hidden h-[832px] w-1/4 flex-col gap-2 bg-gradient-to-r from-gray-700 to-gray-800  px-2 py-4 xl:flex `}
+                            >
+                                <div className="flex h-[160px] w-full flex-col gap-2">
+                                    <div className="mb-2 flex w-full text-xl font-bold">
+                                        {data[i].name}
+                                    </div>
+                                    <div className="flex w-full flex-col justify-between rounded-sm bg-gray-800 px-2 py-1 text-sm">
+                                        <div>
+                                            Ratings count :{" "}
+                                            {data[i].ratings_count}
                                         </div>
-                                        <div className="flex w-full flex-col justify-between rounded-sm bg-gray-800 px-2 py-1 text-sm">
-                                            <div>
-                                                Ratings count :{" "}
-                                                {data[i].ratings_count}
-                                            </div>
-                                            <div
-                                                className={`${
-                                                    +data[i].rating > 4
-                                                        ? "text-blue-400"
-                                                        : "text-orange-400"
-                                                }`}
-                                            >
-                                                {data[i].rating}
-                                            </div>
-                                        </div>
-                                        <div className=" flex w-full gap-1 text-xs ">
-                                            {data[i].genres.map((genre) => {
-                                                return (
-                                                    <div
-                                                        className="flex items-center justify-center rounded-sm bg-gray-800 px-2 py-1  "
-                                                        key={genre.id}
-                                                    >
-                                                        {genre.name.length > 10
-                                                            ? genre.name.substring(
-                                                                  0,
-                                                                  10
-                                                              ) + "..."
-                                                            : genre.name}
-                                                    </div>
-                                                )
-                                            })}
+                                        <div
+                                            className={`${
+                                                +data[i].rating > 4
+                                                    ? "text-blue-400"
+                                                    : "text-orange-400"
+                                            }`}
+                                        >
+                                            {data[i].rating}
                                         </div>
                                     </div>
-                                    {data[i].short_screenshots.map(
-                                        (src, index) => {
+                                    <div className=" flex w-full gap-1 text-xs ">
+                                        {data[i].genres.map((genre) => {
                                             return (
-                                                src.id > 0 &&
-                                                index < 5 && (
-                                                    <div
-                                                        key={src.id}
-                                                        className="flex h-[160px] w-full overflow-hidden rounded shadow-sm shadow-black "
-                                                    >
-                                                        <img
-                                                            width={1280}
-                                                            height={720}
-                                                            className=" object-cover "
-                                                            src={src.image}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                )
+                                                <div
+                                                    className="flex items-center justify-center rounded-sm bg-gray-800 px-2 py-1  "
+                                                    key={genre.id}
+                                                >
+                                                    {genre.name.length > 10
+                                                        ? genre.name.substring(
+                                                              0,
+                                                              10,
+                                                          ) + "..."
+                                                        : genre.name}
+                                                </div>
                                             )
-                                        }
-                                    )}
-                                </>
-                            )
+                                        })}
+                                    </div>
+                                </div>
+                                {data[i].short_screenshots.map((src, index) => {
+                                    return (
+                                        src.id > 0 &&
+                                        index < 5 && (
+                                            <div
+                                                key={src.id}
+                                                className="flex h-[160px] w-full overflow-hidden rounded shadow-sm shadow-black "
+                                            >
+                                                <img
+                                                    width={1280}
+                                                    height={720}
+                                                    className=" object-cover "
+                                                    src={src.image}
+                                                    alt=""
+                                                />
+                                            </div>
+                                        )
+                                    )
+                                })}
+                            </div>
                         )
-                    })}
-            </div>
+                    )
+                })}
         </>
     )
 })

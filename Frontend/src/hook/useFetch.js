@@ -17,6 +17,7 @@ const useFetch = (url) => {
                 setData(() => res.data)
             } catch (err) {
                 setError(err)
+                console.log(err)
             } finally {
                 setLoading(false)
             }
