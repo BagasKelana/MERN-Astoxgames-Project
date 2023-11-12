@@ -48,6 +48,7 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.use(cookieParser())
 app.use(express.json({ limit: "10mb" }))
+app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
 
 //api routes
@@ -56,12 +57,16 @@ app.use("/user", usersRoutes)
 app.use("/games", gamesRoutes)
 
 const storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		console.log(file)
-		cb(null, "public/images")
+	destination: async (req, file, cb) => {
+		const title = req.body.title
+		const name = title.includes(":") ? title.split(":").join("") : title
+		const uploadPath = `public/images/${name}`
+
+		await fs.promises.mkdir(uploadPath, { recursive: true })
+
+		cb(null, uploadPath)
 	},
 	filename: function (req, file, cb) {
-		console.log(file, req.body)
 		cb(null, Date.now() + "-" + file.originalname)
 	},
 })
@@ -89,15 +94,57 @@ app.post("/upload", upload.array("images", 12), function (req, res, next) {
 		]
 
 		for (let i = 0; i < req.files.length; i++) {
-			console.log(req.files[i].path)
 			if (!allowedImageTypes.includes(req.files[i].mimetype)) {
 				responseFail.push(path.relative("public", req.files[i].path))
 			} else {
-				responseSuccess.push(path.relative("public", req.files[i].path))
+				responseSuccess.push({
+					image: `http://localhost:3000/${path.relative(
+						"public",
+						req.files[i].path
+					)}`,
+					upload: true,
+				})
 			}
 		}
-		console.log(responseSuccess)
-		console.log(responseFail)
+
+		return res.send(response)
+	} catch (err) {
+		next(err)
+	}
+})
+app.post("/replace", upload.single("images"), function (req, res, next) {
+	try {
+		console.log(req.file)
+		if (!req.file) return next(createError(500, "multer salah bos"))
+
+		const responseSuccess = []
+		const responseFail = []
+
+		const response = {
+			message: "Image upload Success!",
+			responseSuccess,
+			responseFail,
+		}
+		const allowedImageTypes = [
+			"image/jpeg",
+			"image/png",
+			"image/gif",
+			"image/webp",
+			"image/jpg",
+		]
+
+		if (!allowedImageTypes.includes(req.file.mimetype)) {
+			responseFail.push(path.relative("public", req.file.path))
+		} else {
+			responseSuccess.push({
+				image: `http://localhost:3000/${path.relative(
+					"public",
+					req.file.path
+				)}`,
+				upload: true,
+			})
+		}
+
 		return res.send(response)
 	} catch (err) {
 		next(err)

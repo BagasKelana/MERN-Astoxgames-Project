@@ -18,9 +18,7 @@ const EditGame = () => {
         save: null,
     })
 
-    const { data } = useFetch(
-        `${import.meta.env.VITE_REACT_APP_DEV_MODE}/games/game/${id}`,
-    )
+    const { data } = useFetch(`/api/games/game/${id}`)
 
     const [descriptionGame, setDescriptionGame] = useState({
         name: null,
@@ -34,6 +32,7 @@ const EditGame = () => {
         setDescriptionGame((current) => {
             return {
                 ...current,
+                _id: data?._id,
                 name: data?.name,
                 background_image: data?.background_image,
                 parent_platforms: data?.parent_platforms,
@@ -43,6 +42,7 @@ const EditGame = () => {
             }
         })
     }, [
+        data?._id,
         data?.name,
         data?.background_image,
         data?.parent_platforms,
@@ -91,13 +91,7 @@ const EditGame = () => {
                             }}
                             ref={ref}
                         />
-                        <ScreenshotForm
-                            game={{
-                                title: data?.name,
-                                screenshoot: data?.short_screenshots,
-                            }}
-                            ref={ref}
-                        />
+                        <ScreenshotForm ref={ref} />
                         <div
                             ref={(element) => (ref.current.save = element)}
                             className="w flex h-full flex-col gap-4 rounded-md bg-neutral-800 px-8 py-6 text-neutral-300 shadow shadow-black focus-within:text-white"

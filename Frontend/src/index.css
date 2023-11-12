@@ -8,7 +8,7 @@
     color: white;
     background: rgb(15, 15, 15);
     font-synthesis: none;
-    image-rendering: optimizeQuality;
+    image-rendering: optimizeSpeed;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
