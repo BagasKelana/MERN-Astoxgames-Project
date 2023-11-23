@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useState } from "react"
-import DetailModel from "../DetailModel/DetailModel"
+import DetailModal from "../DetailModal/DetailModal"
 
 const DetailForm = forwardRef(function DetailForm(props, ref) {
     const [modelComponent, setModelComponent] = useState({
@@ -105,20 +105,20 @@ const DetailForm = forwardRef(function DetailForm(props, ref) {
                     </div>
                 </div>
             </div>
-            <DetailModel
+            <DetailModal
                 onClick={handleAddGenres}
                 show={modelComponent.genres}
                 title={game?.title}
                 categories="Genres"
                 data={{ genres: game?.genres }}
             />
-            <DetailModel
+            <DetailModal
                 onClick={handleAddPlatforms}
                 show={modelComponent.platforms}
                 title={game?.title}
                 categories="Platforms"
             />
-            <DetailModel
+            <DetailModal
                 onClick={handleAddTags}
                 show={modelComponent.tags}
                 title={game?.title}

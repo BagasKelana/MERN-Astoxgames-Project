@@ -73,6 +73,7 @@ const GameDetail = () => {
         }
         return review
     }
+  
 
     return (
         <>

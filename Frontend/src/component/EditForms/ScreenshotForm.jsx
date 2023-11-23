@@ -1,5 +1,5 @@
 import { EditGameContext } from "@/pages/EditGame"
-import { current } from "@reduxjs/toolkit"
+
 import axios from "axios"
 import { forwardRef, useContext, useState } from "react"
 import { IoMdClose } from "react-icons/io"
@@ -87,10 +87,26 @@ const ScreenshotForm = forwardRef(function ScreenshotForm(props, ref) {
 
     const replaceScreenshot = async (e) => {
         try {
-            console.log(e.target.files[0])
             const index = e.target.id.split("-")
+
+            const currnetFile = await descriptionGame?.short_screenshots.filter(
+                (screenshot, i) => {
+                    return +index[1] === i
+                },
+            )
+            const currentImage = currnetFile[0].image.startsWith(
+                "https://media.rawg.io/",
+            )
+                ? ""
+                : currnetFile[0].image.replace(
+                      "http://localhost:3000/",
+                      "public/",
+                  )
+
+            console.log(currentImage)
+
             const file = e.target.files[0]
-            console.log(file)
+
             const formData = new FormData()
             const title = await descriptionGame?.name
                 .split(" ")
@@ -99,9 +115,9 @@ const ScreenshotForm = forwardRef(function ScreenshotForm(props, ref) {
 
             const id = await descriptionGame?._id
 
+            formData.append("currentImage", currentImage)
             formData.append("title", title)
             formData.append("_id", id)
-
             formData.append("images", file)
             console.log(formData.getAll("images"))
 

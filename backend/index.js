@@ -11,6 +11,7 @@ import multer from "multer"
 import fs from "fs"
 import path from "path"
 import { createError } from "./utils/error.js"
+import { promisify } from "util"
 
 const app = express()
 dotenv.config()
@@ -71,6 +72,8 @@ const storage = multer.diskStorage({
 	},
 })
 
+const unlinkAsync = promisify(fs.unlink)
+
 const upload = multer({ storage: storage })
 
 app.post("/upload", upload.array("images", 12), function (req, res, next) {
@@ -112,11 +115,9 @@ app.post("/upload", upload.array("images", 12), function (req, res, next) {
 		next(err)
 	}
 })
-app.post("/replace", upload.single("images"), function (req, res, next) {
+app.post("/replace", upload.single("images"), async function (req, res, next) {
 	try {
-		console.log(req.file)
 		if (!req.file) return next(createError(500, "multer salah bos"))
-
 		const responseSuccess = []
 		const responseFail = []
 
@@ -137,13 +138,15 @@ app.post("/replace", upload.single("images"), function (req, res, next) {
 			responseFail.push(path.relative("public", req.file.path))
 		} else {
 			responseSuccess.push({
-				image: `http://localhost:3000/${path.relative(
+				image: `${process.env.SERVER_URL}/${path.relative(
 					"public",
 					req.file.path
 				)}`,
 				upload: true,
 			})
 		}
+
+		req.body.currentImage && (await unlinkAsync(req.body.currentImage))
 
 		return res.send(response)
 	} catch (err) {

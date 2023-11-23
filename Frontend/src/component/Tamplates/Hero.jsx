@@ -28,16 +28,16 @@ const Hero = () => {
 
     return (
         <>
-            <div className="h-full w-full md:w-4/5">
+            <div className="h-full w-full select-none md:w-4/5">
                 <img
                     width={1280}
                     height={720}
-                    className=" h-full w-full rounded object-cover shadow-md"
+                    className=" h-full w-full rounded object-cover shadow shadow-black"
                     src={data?.[srcMainImg].background_image}
                     alt="IMG"
                 />
             </div>
-            <div className="flex h-fit w-full gap-1 px-1 md:w-1/5 md:flex-col md:gap-4">
+            <div className="flex h-full w-full gap-1 px-1 md:w-1/5 md:flex-col md:gap-4">
                 {data?.map((game, index) => {
                     return (
                         <SideImg

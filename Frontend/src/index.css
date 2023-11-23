@@ -6,7 +6,7 @@
 :root {
     font-family: "Roboto", sans-serif;
     color: white;
-    background: rgb(15, 15, 15);
+    background: rgb(24, 24, 24);
     font-synthesis: none;
     image-rendering: optimizeSpeed;
     text-rendering: optimizeLegibility;
@@ -29,6 +29,8 @@ h2 {
 
 html {
     height: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 body {
@@ -36,10 +38,6 @@ body {
     padding: 0;
     box-sizing: border-box;
     height: 100%;
-}
-
-img {
-    -webkit-user-drag: none;
 }
 
 #side-bar::-webkit-scrollbar {

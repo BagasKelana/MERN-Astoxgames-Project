@@ -2,7 +2,7 @@ import { EditGameContext } from "@/pages/EditGame"
 import { useContext } from "react"
 import { AiOutlineClose } from "react-icons/ai"
 
-const DetailModel = ({ onClick, show, title, categories }) => {
+const DetailModal = ({ onClick, show, title, categories }) => {
     const { descriptionGame, setDescriptionGame } = useContext(EditGameContext)
 
     const handleOnKeyDown = (e) => {
@@ -146,4 +146,4 @@ const DetailModel = ({ onClick, show, title, categories }) => {
     )
 }
 
-export default DetailModel
+export default DetailModal
