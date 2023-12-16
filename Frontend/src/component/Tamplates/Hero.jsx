@@ -1,9 +1,9 @@
 import { useState } from "react"
-import useFetch from "@/hook/useFetch" 
-import SideImg from "./SideImg" 
+import useFetch from "@/hook/useFetch"
+import SideImg from "./SideImg"
 
 const Hero = () => {
-    const { data } = useFetch(`http://localhost:3000/games/added?limit=6`)
+    const { data } = useFetch(`/api/games/added?limit=6`)
 
     const [showMainImg, setShowMainImg] = useState([
         true,
@@ -21,23 +21,23 @@ const Hero = () => {
         setShowMainImg(
             showMainImg.map((data, i) => {
                 return +i === +index ? (data = true) : (data = false)
-            })
+            }),
         )
         setSrcMainIMg(index)
     }
 
     return (
         <>
-            <div className="h-full w-full md:w-4/5">
+            <div className="h-full w-full select-none md:w-4/5">
                 <img
                     width={1280}
                     height={720}
-                    className=" h-full w-full rounded object-cover shadow-md"
+                    className=" h-full w-full rounded object-cover shadow shadow-black"
                     src={data?.[srcMainImg].background_image}
                     alt="IMG"
                 />
             </div>
-            <div className="flex h-fit w-full gap-1 px-1 md:w-1/5 md:flex-col md:gap-4">
+            <div className="flex h-full w-full gap-1 px-1 md:w-1/5 md:flex-col md:gap-4">
                 {data?.map((game, index) => {
                     return (
                         <SideImg

@@ -18,11 +18,14 @@ export const MyContext = createContext(false)
 
 const App = () => {
     const [showSideBar, setShowSideBar] = useState(false)
+    const [popUser, setPopUser] = useState(false)
     const location = useLocation()
     console.log()
 
     return (
-        <MyContext.Provider value={{ showSideBar, setShowSideBar }}>
+        <MyContext.Provider
+            value={{ showSideBar, setShowSideBar, popUser, setPopUser }}
+        >
             {!(
                 location.pathname === "/login" ||
                 location.pathname === "/signin"

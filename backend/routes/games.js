@@ -42,4 +42,6 @@ router.get("/released", sortGames)
 //get all sort by rating
 router.get("/rating", sortGames)
 
+router.get("/search", searchGames)
+
 export default router

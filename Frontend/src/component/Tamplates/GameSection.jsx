@@ -8,9 +8,7 @@ const GameSection = ({ getBy, title }) => {
     const [skipData, setSkipData] = useState(false)
     const [tampil, setTampil] = useState(false)
 
-    const { data, loading } = useFetch(
-        `${import.meta.env.VITE_REACT_APP_DEV_MODE}/games/${getBy}?limit=10`
-    )
+    const { data, loading } = useFetch(`/api/games/${getBy}?limit=10`)
 
     const nextCard = () => {
         setSkipData((skip) => !skip)
@@ -54,7 +52,7 @@ const GameSection = ({ getBy, title }) => {
                     return (
                         index < 5 && (
                             <TopGameCard
-                                display={skipData ? "hidden" : ""}
+                                display={skipData && "hidden"}
                                 key={game._id}
                                 src={game.background_image}
                                 title={game.name}

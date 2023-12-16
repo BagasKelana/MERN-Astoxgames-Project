@@ -7,6 +7,11 @@ import authRoutes from "./routes/auth.js"
 import gamesRoutes from "./routes/games.js"
 import usersRoutes from "./routes/users.js"
 import compression from "compression"
+import multer from "multer"
+import fs from "fs"
+import path from "path"
+import { createError } from "./utils/error.js"
+import { promisify } from "util"
 
 const app = express()
 dotenv.config()
@@ -41,16 +46,113 @@ const corsOptions = {
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 	credentials: true,
 }
-
 app.use(cors(corsOptions))
 app.use(cookieParser())
 app.use(express.json({ limit: "10mb" }))
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static("public"))
 
 //api routes
-app.use(express.static("public"))
 app.use("/auth", authRoutes)
 app.use("/user", usersRoutes)
 app.use("/games", gamesRoutes)
+
+const storage = multer.diskStorage({
+	destination: async (req, file, cb) => {
+		const title = req.body.title
+		const name = title.includes(":") ? title.split(":").join("") : title
+		const uploadPath = `public/images/${name}`
+
+		await fs.promises.mkdir(uploadPath, { recursive: true })
+
+		cb(null, uploadPath)
+	},
+	filename: function (req, file, cb) {
+		cb(null, Date.now() + "-" + file.originalname)
+	},
+})
+
+const unlinkAsync = promisify(fs.unlink)
+
+const upload = multer({ storage: storage })
+
+app.post("/upload", upload.array("images", 12), function (req, res, next) {
+	try {
+		if (!req.files) return next(createError(500, "multer salah bos"))
+
+		const responseSuccess = []
+		const responseFail = []
+
+		const response = {
+			message: "Image upload Success!",
+			responseSuccess,
+			responseFail,
+		}
+		const allowedImageTypes = [
+			"image/jpeg",
+			"image/png",
+			"image/gif",
+			"image/webp",
+			"image/jpg",
+		]
+
+		for (let i = 0; i < req.files.length; i++) {
+			if (!allowedImageTypes.includes(req.files[i].mimetype)) {
+				responseFail.push(path.relative("public", req.files[i].path))
+			} else {
+				responseSuccess.push({
+					image: `http://localhost:3000/${path.relative(
+						"public",
+						req.files[i].path
+					)}`,
+					upload: true,
+				})
+			}
+		}
+
+		return res.send(response)
+	} catch (err) {
+		next(err)
+	}
+})
+app.post("/replace", upload.single("images"), async function (req, res, next) {
+	try {
+		if (!req.file) return next(createError(500, "multer salah bos"))
+		const responseSuccess = []
+		const responseFail = []
+
+		const response = {
+			message: "Image upload Success!",
+			responseSuccess,
+			responseFail,
+		}
+		const allowedImageTypes = [
+			"image/jpeg",
+			"image/png",
+			"image/gif",
+			"image/webp",
+			"image/jpg",
+		]
+
+		if (!allowedImageTypes.includes(req.file.mimetype)) {
+			responseFail.push(path.relative("public", req.file.path))
+		} else {
+			responseSuccess.push({
+				image: `${process.env.SERVER_URL}/${path.relative(
+					"public",
+					req.file.path
+				)}`,
+				upload: true,
+			})
+		}
+
+		req.body.currentImage && (await unlinkAsync(req.body.currentImage))
+
+		return res.send(response)
+	} catch (err) {
+		next(err)
+	}
+})
 
 //middleware Error
 app.use((err, req, res, next) => {

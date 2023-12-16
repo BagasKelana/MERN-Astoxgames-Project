@@ -10,9 +10,7 @@ import Layout from "@/Layout/Layout"
 const GameDetail = () => {
     const { id, title } = useParams()
 
-    const { data } = useFetch(
-        `${import.meta.env.VITE_REACT_APP_DEV_MODE}/games/game/${id}`
-    )
+    const { data } = useFetch(`/api/games/game/${id}`)
     const [nav, setNav] = useState({
         nav1: null,
         nav2: null,
@@ -75,6 +73,7 @@ const GameDetail = () => {
         }
         return review
     }
+  
 
     return (
         <>
@@ -125,7 +124,7 @@ const GameDetail = () => {
                                                     </div>
                                                 )
                                             )
-                                        }
+                                        },
                                     )}
                                 </Slider>
 
@@ -153,7 +152,7 @@ const GameDetail = () => {
                                                         </div>
                                                     )
                                                 )
-                                            }
+                                            },
                                         )}
                                     </Slider>
                                 </div>
@@ -190,11 +189,17 @@ const GameDetail = () => {
                                         return (
                                             index <= 8 &&
                                             (index === 8 ? (
-                                                <span className=" flex items-center justify-center  rounded bg-gray-800 bg-opacity-50 py-1  text-center text-xs text-sky-400">
+                                                <span
+                                                    key={9}
+                                                    className=" flex items-center justify-center  rounded bg-gray-800 bg-opacity-50 py-1  text-center text-xs text-sky-400"
+                                                >
                                                     +
                                                 </span>
                                             ) : (
-                                                <span className=" flex items-center justify-center rounded bg-gray-800 bg-opacity-50 py-1 text-center text-xs text-sky-400">
+                                                <span
+                                                    key={tag._id}
+                                                    className=" flex items-center justify-center rounded bg-gray-800 bg-opacity-50 py-1 text-center text-xs text-sky-400"
+                                                >
                                                     {tag.name}
                                                 </span>
                                             ))

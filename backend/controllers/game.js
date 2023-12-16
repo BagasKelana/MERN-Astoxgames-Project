@@ -1,5 +1,6 @@
 import Game from "../models/Game.js"
 import axios from "axios"
+import { createError } from "../utils/error.js"
 
 export const addGame = async (req, res, next) => {
 	try {
@@ -87,19 +88,6 @@ export const sortGames = async (req, res, next) => {
 	}
 }
 
-export const searchGames = async (req, res, next) => {
-	try {
-		const { name } = req.params
-		console.log(name)
-		const games = await Game.find({
-			$text: { $search: name, $caseSensitive: false },
-		}).lean()
-		res.status(200).json(games)
-	} catch (err) {
-		next(err)
-	}
-}
-
 export const updateGames = async (req, res, next) => {
 	try {
 		const { background_image } = req.body
@@ -145,5 +133,85 @@ export const updateManyGames = async (req, res, next) => {
 		res.status(200).send()
 	} catch (err) {
 		next(err)
+	}
+}
+
+export const searchGames = async (req, res, next) => {
+	try {
+		const limit = parseInt(req.query.limit) || 12
+		const startIndex = parseInt(req.query.startIndex) || 0
+
+		const searchTerm = req.query.term || ""
+		console.log(searchTerm)
+
+		const regexSearchTerm = searchTerm
+			? searchTerm
+					.split("")
+					.map((char) => `${char}.*`)
+					.join("")
+			: ""
+
+		console.log(regexSearchTerm)
+
+		const queryParams = {
+			name: {
+				$regex: regexSearchTerm,
+				$options: "i",
+			},
+		}
+
+		const platform = req.query.platform || ""
+		const genre = req.query.genre || ""
+
+		if (platform) {
+			queryParams.parent_platforms = {
+				$elemMatch: {
+					"platform.slug": platform,
+				},
+			}
+		}
+
+		if (genre) {
+			queryParams.genres = {
+				$elemMatch: {
+					slug: genre,
+				},
+			}
+		}
+
+		const categories = req.query.categories || ""
+		const sort = categories === "name" ? 1 : -1
+
+		if (categories) {
+			const count = await Game.countDocuments(queryParams)
+			const Games = await Game.find(queryParams)
+				.limit(limit)
+				.skip(startIndex)
+				.sort({ [categories]: sort })
+
+			const excludedGames = await Game.find({
+				_id: { $nin: Games.map((game) => game._id) },
+			}).limit(limit - Games.length)
+
+			console.log(count)
+
+			return res.status(200).json([...Games, ...excludedGames])
+		}
+		const Games = await Game.find(queryParams).limit(limit).skip(startIndex)
+		const excludedGames = await Game.find({
+			_id: { $nin: Games.map((game) => game._id) },
+		}).limit(limit - +Games.length)
+
+		return res.status(200).json([...Games, ...excludedGames])
+
+		// if (Games.length < 10) {
+		// 	const Games2 = await Game.find(queryParams)
+		// 		.sort({ [categories]: sort })
+		// 		.limit(limit - Games.length)
+		// 		.skip(startIndex)
+		// }
+	} catch (error) {
+		console.error(error)
+		next(error)
 	}
 }
