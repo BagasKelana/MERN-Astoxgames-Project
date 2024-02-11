@@ -17,8 +17,6 @@ const Navbar = () => {
         useContext(MyContext)
     const { currentUser } = useSelector((state) => state.user)
 
-    const navigate = useNavigate()
-
     const showPopUser = (e) => {
         e.stopPropagation()
         setPopUser((current) => !current)
@@ -124,8 +122,8 @@ const SearchInput = () => {
     const [term, setTerm] = useState("")
     const [showDropDownSearch, setShowDropDownSearch] = useState(false)
     const [value] = useDebounce(term, 1000)
-    const [queryParameters] = useSearchParams()
     const [data, setData] = useState(null)
+    const [gameCount, setGameCount] = useState()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -137,7 +135,8 @@ const SearchInput = () => {
                         `/api/games/search?term=${value}`,
                     )
                     const result = await response.data
-                    setData(() => result)
+                    setData(() => result.games)
+                    setGameCount(() => result.count)
                     console.log(result)
                 } catch (err) {
                     console.log(err)
@@ -153,27 +152,18 @@ const SearchInput = () => {
     const handleOnKeyDown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault()
-            queryParameters.has("term")
-                ? queryParameters.set("term", e.target.value)
-                : queryParameters.append("term", e.target.value)
 
-            e.target.value &&
-                navigate(
-                    `/search?term=${queryParameters.get(
-                        "term",
-                    )}&categories=&platform=&genre=`,
-                )
+            if (e.target.value) {
+                const url = `/search?term=${e.target.value}&categories=&platform=&genre=`
+                navigate(url)
+            }
 
             return setTerm(() => "")
         }
     }
     const handleOnChange = (e) => {
         setTerm(() => e.target.value)
-        if (data?.length) {
-            setLoading(() => false)
-        } else {
-            setLoading(() => true)
-        }
+        setLoading(() => true)
     }
     const handleOnCLick = (e) => {
         e.preventDefault()
@@ -261,7 +251,7 @@ const SearchInput = () => {
                                             width={500}
                                             height={500}
                                             className="h-full w-full rounded-md object-cover"
-                                            src={game.background_image}
+                                            src={`/api${game.card_image}`}
                                             alt="search-image"
                                         />
                                     </div>
@@ -290,7 +280,7 @@ const SearchInput = () => {
                         <hr />
                         <div className=" flex w-full justify-between">
                             <div>See all result</div>
-                            <div>51000</div>
+                            <div>{gameCount && gameCount} Games</div>
                         </div>
                     </div>
                 )}

@@ -1,7 +1,7 @@
 import { MyContext } from "@/App"
 import { useContext } from "react"
 
-const Layout = ({ children }) => {
+const Layout = ({ children, className }) => {
     const { showSideBar, popUser, setPopUser } = useContext(MyContext)
 
     const showPopUser = (e) => {
@@ -11,7 +11,7 @@ const Layout = ({ children }) => {
 
     return (
         <>
-            <div className=" flex min-h-screen flex-col">
+            <div className={`${className} flex min-h-screen flex-col`}>
                 <div className=" h-full w-full flex-grow">
                     <main
                         onClick={(e) => {

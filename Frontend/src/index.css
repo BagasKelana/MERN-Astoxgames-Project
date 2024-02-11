@@ -14,18 +14,6 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
 }
-p {
-    font-weight: 300;
-    line-height: 22px;
-}
-h1 {
-    font-weight: 700;
-    line-height: 2px;
-}
-h2 {
-    font-weight: 500;
-    line-height: 12px;
-}
 
 html {
     height: 100%;
@@ -140,4 +128,16 @@ ul {
     display: block;
     height: 100vh;
     overflow: hidden;
+}
+
+.absolute-center-element {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.bb_ul > li {
+    list-style-type: circle;
+    margin-left: 1rem;
+    font-size: small;
 }

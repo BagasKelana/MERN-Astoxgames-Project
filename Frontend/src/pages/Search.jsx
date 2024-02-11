@@ -1,33 +1,86 @@
 import Layout from "@/Layout/Layout"
-import TopGameCard from "@/component/Card/TopGameCard"
 import useFetch from "@/hook/useFetch"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState, useMemo, useCallback } from "react"
 import { MdArrowForwardIos } from "react-icons/md"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import { filterList } from "@/assets/filterList"
+import GameCard from "@/component/Card/GameCard"
+import useInfiniteSearch from "@/hook/useInfiniteSearch"
+
 const Search = () => {
     const [queryParameters] = useSearchParams()
-    const term = queryParameters.has("term") ? queryParameters.get("term") : ""
-    const navigate = useNavigate()
 
     const [filter, setFilter] = useState({
-        categories: "",
-        genres: "",
-        platforms: "",
+        term: queryParameters.get("term"),
+        genres: queryParameters.get("genre"),
+        categories: queryParameters.get("categories"),
+        platforms: queryParameters.get("platform"),
     })
-
-    const endPoint = `/search?term=${term}&categories=${filter.categories}&platform=${filter.platforms}&genre=${filter.genres}`
+    const [pageNum, setPageNum] = useState({
+        skip: 0,
+        limit: 12,
+        page: 1,
+    })
+    console.log(filter)
 
     useEffect(() => {
-        navigate(endPoint)
-    }, [endPoint])
+        let initialFilterState = {
+            term: queryParameters.get("term"),
+            genres: queryParameters.get("genre"),
+            categories: queryParameters.get("categories"),
+            platforms: queryParameters.get("platform"),
+        }
+        {
+            setFilter((current) => ({
+                ...current,
+                ...initialFilterState,
+            }))
+        }
+        return () =>
+            setPageNum((current) => ({
+                ...current,
+                skip: 0,
+                limit: 12,
+                page: 1,
+            }))
+    }, [queryParameters])
 
-    console.log("halo")
+    const querySearch = useMemo(() => {
+        return `/search?term=${filter.term || ""}&categories=${
+            filter.categories || ""
+        }&platform=${filter.platforms || ""}&genre=${filter.genres || ""}`
+    }, [filter])
 
-    const url = term && `/api/games${endPoint}`
+    const url = `/api/games`
 
-    console.log(url)
+    const { data, loading, error, hasNextData } = useInfiniteSearch(
+        url,
+        pageNum.skip,
+        querySearch,
+    )
 
-    const { data, loading } = useFetch(url)
+    const intObserver = useRef()
+    const lastPostRef = useCallback(
+        (post) => {
+            if (loading) return
+
+            if (intObserver.current) intObserver.current.disconnect()
+
+            intObserver.current = new IntersectionObserver((posts) => {
+                if (posts[0].isIntersecting && hasNextData) {
+                    console.log("We are near the last post!")
+                    setPageNum((prev) => ({
+                        ...prev,
+                        skip: prev.limit * prev.page,
+                        page: prev.page + 1,
+                    }))
+                }
+            })
+
+            if (post) intObserver.current.observe(post)
+        },
+        [loading, hasNextData],
+    )
 
     return (
         <Layout>
@@ -56,17 +109,42 @@ const Search = () => {
                 </div>
                 <div className="flex h-full w-full  ">
                     <FilterComponent searchFilter={[filter, setFilter]} />
-                    <div className="grid h-full w-full grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3 xl:w-5/6 xl:grid-cols-4">
-                        {data?.map((game) => {
-                            return (
-                                <TopGameCard
+                    <div className="grid h-full w-full grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3 xl:w-5/6 xl:grid-cols-3">
+                        {data?.map((game, index) => {
+                            return index === data?.length - 1 ? (
+                                <GameCard
+                                    ref={lastPostRef}
                                     width="w-full"
                                     key={game._id}
-                                    src={game.background_image}
+                                    src={
+                                        game.card_image
+                                            ? `/api${game.card_image}`
+                                            : game.background_image
+                                    }
                                     title={game.name}
                                     rating={game.rating}
                                     id={game._id}
                                     platforms={game.parent_platforms}
+                                    genres={game.genres}
+                                    release_date={game.released}
+                                    popularity={game.added}
+                                />
+                            ) : (
+                                <GameCard
+                                    width="w-full"
+                                    key={game._id}
+                                    src={
+                                        game.card_image
+                                            ? `/api${game.card_image}`
+                                            : game.background_image
+                                    }
+                                    title={game.name}
+                                    rating={game.rating}
+                                    id={game._id}
+                                    platforms={game.parent_platforms}
+                                    genres={game.genres}
+                                    release_date={game.released}
+                                    popularity={game.added}
                                 />
                             )
                         })}
@@ -78,14 +156,14 @@ const Search = () => {
 }
 
 const FilterComponent = ({ searchFilter }) => {
+    const [queryParameters, setQueryParameters] = useSearchParams()
     const [showFilter, setShowFilter] = useState({
         Categories: true,
         Platforms: true,
         Genres: false,
     })
-    const [queryParameters] = useSearchParams()
+
     const [filter, setFilter] = searchFilter
-    console.log(filter)
 
     const handleShowCategoris = () => {
         setShowFilter((value) => {
@@ -105,50 +183,58 @@ const FilterComponent = ({ searchFilter }) => {
 
     const filterCategories = (event) => {
         if (filter.categories && filter.categories === event.target.id) {
-            return setFilter((current) => {
-                return { ...current, categories: "" }
-            })
+            queryParameters.set("categories", "")
+            return setQueryParameters(queryParameters)
         }
         if (event.target.id === "relevance") {
-            return setFilter((current) => {
-                return { ...current, categories: "" }
-            })
+            queryParameters.set("categories", "")
+            return setQueryParameters(queryParameters)
         }
-        return setFilter((current) => {
-            return { ...current, categories: event.target.id }
-        })
+
+        queryParameters.set("categories", event.target.id)
+        return setQueryParameters(queryParameters)
     }
 
     const filterPlatforms = (event) => {
         if (filter.platforms && filter.platforms === event.target.id) {
-            return setFilter((current) => {
-                return { ...current, platforms: "" }
-            })
+            queryParameters.set("platform", "")
+            return setQueryParameters(queryParameters)
         }
-        return setFilter((current) => {
-            return { ...current, platforms: event.target.id }
-        })
+        queryParameters.set("platform", event.target.id)
+        return setQueryParameters(queryParameters)
     }
 
     const filterGenres = (event) => {
         if (filter.genres && filter.genres === event.target.id) {
-            return setFilter((current) => {
-                return { ...current, genres: "" }
-            })
+            queryParameters.set("genre", "")
+            return setQueryParameters(queryParameters)
         }
-        return setFilter((current) => {
-            return { ...current, genres: event.target.id }
-        })
+        queryParameters.set("genre", event.target.id)
+        return setQueryParameters(queryParameters)
     }
+    const handleShowAllGames = () => {
+        queryParameters.set("term", "")
+        queryParameters.set("genre", "")
+        queryParameters.set("platform", "")
+        queryParameters.set("categories", "")
+        return setQueryParameters(queryParameters)
+    }
+
     return (
         <div className=" hidden h-full w-1/6 flex-col gap-4 p-4  xl:flex ">
             <div>Filter</div>
-            <div className="h-full w-full">
+            <div className="h-full w-full shadow shadow-black">
                 <div className="flex w-full flex-col ">
                     <div>
                         <div
+                            onClick={handleShowAllGames}
+                            className="flex cursor-pointer items-center justify-between p-2 shadow shadow-black "
+                        >
+                            <div>All Games</div>
+                        </div>
+                        <div
                             onClick={handleShowCategoris}
-                            className="flex items-center justify-between p-2  "
+                            className="flex cursor-pointer items-center justify-between p-2 shadow shadow-black "
                         >
                             <div>Categories</div>
                             <span
@@ -161,6 +247,7 @@ const FilterComponent = ({ searchFilter }) => {
                                 <MdArrowForwardIos />
                             </span>
                         </div>
+
                         <ul
                             className={`${
                                 showFilter.Categories
@@ -168,47 +255,34 @@ const FilterComponent = ({ searchFilter }) => {
                                     : " h-[0px] scale-y-0"
                             } ml-5 flex origin-top flex-col overflow-hidden text-sm transition-all duration-200 ease-in-out`}
                         >
-                            <li
-                                id="relevance"
-                                onClick={filterCategories}
-                                className="cursor-pointer p-2"
-                            >
-                                Relevance
-                            </li>
-                            <li
-                                id="name"
-                                onClick={filterCategories}
-                                className="cursor-pointer p-2"
-                            >
-                                Name
-                            </li>
-                            <li
-                                id="released"
-                                onClick={filterCategories}
-                                className="cursor-pointer p-2"
-                            >
-                                Realease
-                            </li>
-                            <li
-                                id="added"
-                                onClick={filterCategories}
-                                className="cursor-pointer p-2"
-                            >
-                                Popularity
-                            </li>
-                            <li
-                                id="rating"
-                                onClick={filterCategories}
-                                className="cursor-pointer p-2"
-                            >
-                                Rating
-                            </li>
+                            {filterList.Categories.map((list, index) => {
+                                return list.id === filter.categories ||
+                                    (filter.categories === "" &&
+                                        list.id === "relevance") ? (
+                                    <List
+                                        className={"bg-blue-600"}
+                                        key={index}
+                                        onClick={filterCategories}
+                                        id={list.id}
+                                    >
+                                        {list.value}
+                                    </List>
+                                ) : (
+                                    <List
+                                        key={index}
+                                        onClick={filterCategories}
+                                        id={list.id}
+                                    >
+                                        {list.value}
+                                    </List>
+                                )
+                            })}
                         </ul>
                     </div>
                     <div>
                         <div
                             onClick={handleShowPlatforms}
-                            className="flex items-center justify-between p-2  "
+                            className="flex items-center justify-between p-2 shadow shadow-black  "
                         >
                             <div>Plateforms</div>
                             <span
@@ -228,61 +302,32 @@ const FilterComponent = ({ searchFilter }) => {
                                     : " h-0 scale-y-0"
                             } ml-5 flex origin-top flex-col overflow-hidden text-sm transition-all duration-200 ease-in-out`}
                         >
-                            <li
-                                onClick={filterPlatforms}
-                                id="playstation"
-                                className="cursor-pointer p-2"
-                            >
-                                Playstation
-                            </li>
-                            <li
-                                onClick={filterPlatforms}
-                                id="pc"
-                                className="cursor-pointer p-2"
-                            >
-                                PC
-                            </li>
-                            <li
-                                onClick={filterPlatforms}
-                                id="xbox"
-                                className="cursor-pointer p-2"
-                            >
-                                Xbox
-                            </li>
-                            <li
-                                onClick={filterPlatforms}
-                                id="ios"
-                                className="cursor-pointer p-2"
-                            >
-                                iOS
-                            </li>
-                            <li
-                                onClick={filterPlatforms}
-                                id="android"
-                                className="cursor-pointer p-2"
-                            >
-                                Android
-                            </li>
-                            <li
-                                onClick={filterPlatforms}
-                                id="nintendo"
-                                className="cursor-pointer p-2"
-                            >
-                                Nintendo
-                            </li>
-                            <li
-                                onClick={filterPlatforms}
-                                id="web"
-                                className="cursor-pointer p-2"
-                            >
-                                Web
-                            </li>
+                            {filterList.Platforms.map((list, index) => {
+                                return list.id === filter.platforms ? (
+                                    <List
+                                        className={"bg-blue-600"}
+                                        key={index}
+                                        onClick={filterPlatforms}
+                                        id={list.id}
+                                    >
+                                        {list.value}
+                                    </List>
+                                ) : (
+                                    <List
+                                        key={index}
+                                        onClick={filterPlatforms}
+                                        id={list.id}
+                                    >
+                                        {list.value}
+                                    </List>
+                                )
+                            })}
                         </ul>
                     </div>
                     <div>
                         <div
                             onClick={handleShowGenres}
-                            className="flex items-center justify-between p-2  "
+                            className="flex items-center justify-between p-2 shadow shadow-black "
                         >
                             <div>Genres</div>
                             <span
@@ -302,62 +347,26 @@ const FilterComponent = ({ searchFilter }) => {
                                     : " h-0 scale-y-0"
                             } ml-5 flex origin-top flex-col overflow-hidden text-sm transition-all duration-200 ease-in-out`}
                         >
-                            <li
-                                onClick={filterGenres}
-                                id="action"
-                                className="cursor-pointer p-2"
-                            >
-                                Action
-                            </li>
-                            <li
-                                onClick={filterGenres}
-                                id="strategy"
-                                className="cursor-pointer p-2"
-                            >
-                                Strategy
-                            </li>
-                            <li
-                                onClick={filterGenres}
-                                id="rpg"
-                                className="cursor-pointer p-2"
-                            >
-                                RPG
-                            </li>
-                            <li
-                                onClick={filterGenres}
-                                id="shooter"
-                                className="cursor-pointer p-2"
-                            >
-                                Shooter
-                            </li>
-                            <li
-                                onClick={filterGenres}
-                                id="adventure"
-                                className="cursor-pointer p-2"
-                            >
-                                Adventure
-                            </li>
-                            <li
-                                onClick={filterGenres}
-                                id="puzzle"
-                                className="cursor-pointer p-2"
-                            >
-                                Puzzle
-                            </li>
-                            <li
-                                onClick={filterGenres}
-                                id="racing"
-                                className="cursor-pointer p-2"
-                            >
-                                Racing
-                            </li>
-                            <li
-                                onClick={filterGenres}
-                                id="sports"
-                                className="cursor-pointer p-2"
-                            >
-                                Sports
-                            </li>
+                            {filterList.Genres.map((list, index) => {
+                                return list.id === filter.genres ? (
+                                    <List
+                                        className={"bg-blue-600"}
+                                        key={index}
+                                        onClick={filterGenres}
+                                        id={list.id}
+                                    >
+                                        {list.value}
+                                    </List>
+                                ) : (
+                                    <List
+                                        key={index}
+                                        onClick={filterGenres}
+                                        id={list.id}
+                                    >
+                                        {list.value}
+                                    </List>
+                                )
+                            })}
                         </ul>
                     </div>
                 </div>
@@ -365,4 +374,17 @@ const FilterComponent = ({ searchFilter }) => {
         </div>
     )
 }
+
+const List = ({ onClick, id, children, className }) => {
+    return (
+        <li
+            onClick={onClick}
+            id={id}
+            className={`${className} cursor-pointer p-2`}
+        >
+            {children}
+        </li>
+    )
+}
+
 export default Search

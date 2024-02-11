@@ -32,7 +32,7 @@ const HomeCardsContent = memo(function HomeCardsContent({ urlBy }) {
                             onClick={() => handleOnMouseEnter(index)}
                             cardActive={cardActive[index]}
                             key={game._id}
-                            src={game.background_image}
+                            src={`/api${game.card_image}`}
                             genres={game.genres}
                             title={game.name}
                             platforms={game.parent_platforms}
@@ -68,7 +68,7 @@ const HomeCardsContent = memo(function HomeCardsContent({ urlBy }) {
                                             {data[i].rating}
                                         </div>
                                     </div>
-                                    <div className=" flex w-full gap-1 text-xs ">
+                                    <div className=" grid w-full grid-cols-3 gap-1 text-xs ">
                                         {data[i].genres.map((genre) => {
                                             return (
                                                 <div

@@ -1,5 +1,5 @@
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
-import TopGameCard from "../Card/TopGameCard"
+import TopGameCard from "../Card/GameCard"
 import { Link } from "react-router-dom"
 import useFetch from "@/hook/useFetch"
 import { useState } from "react"
@@ -19,13 +19,17 @@ const GameSection = ({ getBy, title }) => {
         setSkipData((skip) => !skip)
         setTampil(true)
     }
+    const url = `/search?term&categories=${getBy}&platform=&genre=`
 
     return (
         <>
             <div className="flex h-full w-full">
                 <div className="flex w-full justify-between ">
                     <div className="text-xl font-bold">{title}</div>
-                    <Link className="z-[50] flex cursor-pointer items-center text-base font-normal">
+                    <Link
+                        to={url}
+                        className="z-[50] flex cursor-pointer items-center text-base font-normal"
+                    >
                         More
                         <IoIosArrowForward />
                     </Link>
@@ -39,11 +43,19 @@ const GameSection = ({ getBy, title }) => {
                                 <TopGameCard
                                     display={skipData ? "" : "hidden"}
                                     key={game._id}
-                                    src={game.background_image}
+                                    src={
+                                        game.card_image
+                                            ? `/api${game.card_image}`
+                                            : game.background_image
+                                    }
                                     title={game.name}
                                     rating={game.rating}
                                     loading={loading}
                                     id={game._id}
+                                    platforms={game.parent_platforms}
+                                    genres={game.genres}
+                                    release_date={game.released}
+                                    popularity={game.added}
                                 />
                             )
                         )
@@ -54,11 +66,19 @@ const GameSection = ({ getBy, title }) => {
                             <TopGameCard
                                 display={skipData && "hidden"}
                                 key={game._id}
-                                src={game.background_image}
+                                src={
+                                    game.card_image
+                                        ? `/api${game.card_image}`
+                                        : game.background_image
+                                }
                                 title={game.name}
                                 rating={game.rating}
                                 loading={loading}
                                 id={game._id}
+                                platforms={game.parent_platforms}
+                                genres={game.genres}
+                                release_date={game.released}
+                                popularity={game.added}
                             />
                         )
                     )

@@ -13,6 +13,7 @@ import UserProfile from "./pages/UserProfile"
 import PrivateRoute from "./component/PrivateRoute/PrivateRoute"
 import UserSetting from "./pages/UserSetting"
 import Search from "./pages/Search"
+import Download from "./pages/Download"
 
 export const MyContext = createContext(false)
 
@@ -43,7 +44,7 @@ const App = () => {
                     <Route path="/user/setting" element={<UserSetting />} />
                 </Route>
                 <Route path="/signin" element={<SignIn />} />
-
+                <Route path="/download" element={<Download />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/game/:id/:title" element={<GameDetail />} />

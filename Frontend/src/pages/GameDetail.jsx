@@ -6,6 +6,7 @@ import Slider from "react-slick"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
 import Layout from "@/Layout/Layout"
+import TopGameCard from "@/component/Card/GameCard"
 
 const GameDetail = () => {
     const { id, title } = useParams()
@@ -24,37 +25,36 @@ const GameDetail = () => {
     }, [nav.nav1, nav.nav2])
 
     const settings = {
-        dots: false,
         infinite: true,
-        speed: 300,
-        slidesToShow: 5,
+        speed: 500,
+        slidesToShow: 6,
         slidesToScroll: 1,
-        initialSlide: 1,
+        initialSlide: 0,
         swipeToSlide: true,
-        focusOnSelect: true,
-        adaptiveHeight: true,
+        useTransform: true,
+        easing: "easeIn",
+
         responsive: [
             {
                 breakpoint: 1024,
                 settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 3,
+                    slidesToShow: 5,
+                    slidesToScroll: 1,
                     infinite: true,
-                    dots: false,
                 },
             },
             {
                 breakpoint: 600,
                 settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2,
-                    initialSlide: 2,
+                    slidesToShow: 4,
+                    slidesToScroll: 1,
+                    initialSlide: 0,
                 },
             },
             {
                 breakpoint: 480,
                 settings: {
-                    slidesToShow: 1,
+                    slidesToShow: 4,
                     slidesToScroll: 1,
                 },
             },
@@ -73,12 +73,19 @@ const GameDetail = () => {
         }
         return review
     }
-  
+
+    function formatDate(inputDate) {
+        const options = { month: "short", day: "numeric", year: "numeric" }
+        const date = new Date(inputDate)
+        console.log(date)
+        const formattedDate = date.toLocaleDateString("en-US", options)
+        return formattedDate
+    }
 
     return (
         <>
             <div
-                className="absolute top-0 h-screen w-full"
+                className="absolute top-0 h-screen w-full "
                 style={{
                     backgroundImage: `url(${data?.background_image})`,
                     backgroundSize: "cover",
@@ -97,25 +104,25 @@ const GameDetail = () => {
                     <h1 className="flex text-3xl font-bold tracking-wide">
                         {data?.name}
                     </h1>
-                    <section className=" flex h-full   flex-col gap-4 ">
-                        <div className="flex h-full w-full gap-4 ">
-                            <div className="flex h-full w-4/6 flex-col gap-2 ">
-                                <Slider
-                                    nextArrow={<SampleNextArrow />}
-                                    prevArrow={<SamplePrevArrow />}
-                                    asNavFor={nav.nav2}
-                                    ref={(slider) => (ref.slider1 = slider)}
-                                >
-                                    {data?.short_screenshots.map(
-                                        (screenshot, index) => {
-                                            return (
-                                                index != 0 && (
+                    <section className=" flex h-full flex-col gap-4 ">
+                        <div className="flex  h-fit w-full flex-col gap-4  lg:flex-row ">
+                            <div className="flex h-full w-full  flex-col gap-2  lg:w-4/6 ">
+                                <div className="h-full w-full">
+                                    <Slider
+                                        nextArrow={<SampleNextArrow />}
+                                        prevArrow={<SamplePrevArrow />}
+                                        asNavFor={nav.nav2}
+                                        ref={(slider) => (ref.slider1 = slider)}
+                                    >
+                                        {data?.short_screenshots.map(
+                                            (screenshot) => {
+                                                return (
                                                     <div
                                                         key={screenshot.id}
-                                                        className=" aspect-video   overflow-hidden rounded-lg  shadow shadow-black "
+                                                        className=" aspect-video overflow-hidden  rounded-md  shadow shadow-black "
                                                     >
                                                         <img
-                                                            className="  object-cover "
+                                                            className="object-cover "
                                                             src={
                                                                 screenshot.image
                                                             }
@@ -123,41 +130,38 @@ const GameDetail = () => {
                                                         />
                                                     </div>
                                                 )
-                                            )
-                                        },
-                                    )}
-                                </Slider>
-
-                                <div className="  w-full px-36">
+                                            },
+                                        )}
+                                    </Slider>
+                                </div>
+                                <div className="hidden h-full w-full px-20 md:block lg:px-5 ">
                                     <Slider
                                         asNavFor={nav.nav1}
                                         ref={(slider) => (ref.slider2 = slider)}
                                         {...settings}
                                     >
                                         {data?.short_screenshots.map(
-                                            (screenshot, index) => {
+                                            (screenshot) => {
                                                 return (
-                                                    index != 0 && (
-                                                        <div
-                                                            key={screenshot.id}
-                                                            className=" aspect-video overflow-hidden  px-2 shadow shadow-black "
-                                                        >
-                                                            <img
-                                                                className=" h-full w-full   cursor-pointer rounded-md object-cover   "
-                                                                src={
-                                                                    screenshot.image
-                                                                }
-                                                                alt=""
-                                                            />
-                                                        </div>
-                                                    )
+                                                    <div
+                                                        key={screenshot.id}
+                                                        className=" aspect-video overflow-hidden  px-2 shadow shadow-black "
+                                                    >
+                                                        <img
+                                                            className=" h-full w-full  cursor-pointer  object-cover"
+                                                            src={
+                                                                screenshot.image
+                                                            }
+                                                            alt=""
+                                                        />
+                                                    </div>
                                                 )
                                             },
                                         )}
                                     </Slider>
                                 </div>
                             </div>
-                            <div className=" flex h-full w-2/6 flex-col gap-4 overflow-hidden rounded   bg-gradient-to-t from-[rgba(15,15,15)] to-transparent  p-4  ">
+                            <div className="flex h-full w-full flex-col gap-4 overflow-hidden rounded bg-gradient-to-t from-[rgba(15,15,15)] to-transparent p-4  xl:w-2/6  ">
                                 <img
                                     className="aspect-video rounded-md object-cover"
                                     src={data?.background_image}
@@ -175,30 +179,31 @@ const GameDetail = () => {
                                     <div className="flex flex-col gap-2">
                                         <span>{data?.name}</span>
                                         <span>
-                                            {data?.released.substring(0, 10)}
+                                            {formatDate(data?.released)}
                                         </span>
                                         <span>
-                                            {data?.suggestions_count} Users
+                                            {data?.suggestions_count.toLocaleString()}{" "}
+                                            Users
                                         </span>
                                         {data?.rating &&
                                             userRating(data?.rating)}
                                     </div>
                                 </div>
-                                <div className="grid h-full w-full auto-cols-auto  grid-flow-col-dense   grid-rows-3 gap-1">
+                                <div className="grid h-full w-full auto-cols-auto  grid-flow-col-dense grid-rows-3 gap-1">
                                     {data?.tags.map((tag, index) => {
                                         return (
                                             index <= 8 &&
                                             (index === 8 ? (
                                                 <span
                                                     key={9}
-                                                    className=" flex items-center justify-center  rounded bg-gray-800 bg-opacity-50 py-1  text-center text-xs text-sky-400"
+                                                    className=" flex items-center justify-center  rounded bg-gray-800 bg-opacity-50 p-2  text-center text-xs text-sky-400"
                                                 >
                                                     +
                                                 </span>
                                             ) : (
                                                 <span
                                                     key={tag._id}
-                                                    className=" flex items-center justify-center rounded bg-gray-800 bg-opacity-50 py-1 text-center text-xs text-sky-400"
+                                                    className=" flex items-center justify-center rounded bg-gray-800 bg-opacity-50 p-2 text-center text-xs text-sky-400"
                                                 >
                                                     {tag.name}
                                                 </span>
@@ -209,7 +214,7 @@ const GameDetail = () => {
                             </div>
                         </div>
                     </section>
-                    <section className=" main-section h-[500px]  gap-2  ">
+                    <section className=" main-section gap-2  ">
                         <div className="flex h-full w-full gap-2">
                             <div className="flex w-4/6 flex-col gap-4 ">
                                 <div>
@@ -218,6 +223,38 @@ const GameDetail = () => {
                                     </div>
                                     <p>{`Hello I'm bagas here, I hope we share a lot about our games and don't forget to write comments about your favorite games, let's share together about our game experiences`}</p>
                                 </div>
+                                <div className="flex h-full w-full flex-col gap-4">
+                                    {data?.platforms.map((game) => {
+                                        return (
+                                            game.platform.slug === "pc" &&
+                                            game.requirements_en !== null && (
+                                                <div
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: game
+                                                            .requirements_en
+                                                            .minimum,
+                                                    }}
+                                                />
+                                            )
+                                        )
+                                    })}
+
+                                    {data?.platforms.map((game) => {
+                                        return (
+                                            game.platform.slug === "pc" &&
+                                            game.requirements_en !== null && (
+                                                <div
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: game
+                                                            .requirements_en
+                                                            .recommended,
+                                                    }}
+                                                />
+                                            )
+                                        )
+                                    })}
+                                </div>
+
                                 <div>
                                     <div className="text-xl font-bold">
                                         About Me
@@ -236,6 +273,10 @@ const GameDetail = () => {
                                 </Link>
                             </div>
                         </div>
+                    </section>
+                    <section className="main-section h-full gap-2">
+                        <div>Game like {data?.name}</div>
+                        <GameLike id={id} />
                     </section>
                 </div>
             </Layout>
@@ -262,6 +303,28 @@ function SamplePrevArrow(props) {
             style={{ ...style, display: "none", background: "green" }}
             onClick={onClick}
         />
+    )
+}
+
+const GameLike = ({ id }) => {
+    const { data } = useFetch(`/api/games/games-like?id=${id}`)
+
+    return (
+        <div className="gird grid h-full w-full grid-cols-5 gap-3">
+            {data?.map((value) => {
+                return (
+                    <TopGameCard
+                        key={value._id}
+                        width="w-full"
+                        src={`/api${value.card_image}`}
+                        title={value.name}
+                        rating={value.rating}
+                        platforms={value.parent_platforms}
+                        id={value._id}
+                    />
+                )
+            })}
+        </div>
     )
 }
 
