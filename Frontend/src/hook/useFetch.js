@@ -5,40 +5,46 @@ const useFetch = (url = null) => {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
-    console.log(url)
 
     useEffect(() => {
-        if (url) {
-            const fetchData = async () => {
-                try {
-                    const res = await axios.get(url)
-                    if (res?.length) {
-                        setData(() => [...res.data])
-                        return null
-                    }
-                    setData(() => res.data)
-                } catch (err) {
-                    setError(err)
-                    console.log(err)
-                } finally {
-                    setLoading(false)
+        const controller = new AbortController()
+        const { signal } = controller
+        const fetchData = async () => {
+            try {
+                console.log(url)
+                const res = await axios.get(url, { signal })
+
+                if (res?.data) {
+                    setData(res.data)
+                } else {
+                    setData([])
                 }
+            } catch (err) {
+                if (signal.aborted) return
+                setError(err)
+                console.error(err)
+            } finally {
+                setLoading(false)
             }
-            fetchData()
         }
+
+        fetchData()
+
+        return () => controller.abort()
     }, [url])
 
-    const reFatch = async () => {
+    const refetch = async () => {
         try {
             const res = await axios.get(url)
             setData(res.data)
         } catch (err) {
             setError(err)
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }
 
-    return { data, loading, error, reFatch }
+    return { data, loading, error, refetch }
 }
 
 export default useFetch

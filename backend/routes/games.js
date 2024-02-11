@@ -7,6 +7,8 @@ import {
 	updateGames,
 	getGame,
 	updateManyGames,
+	getGamesId,
+	getGameLike,
 } from "../controllers/game.js"
 
 const router = express.Router()
@@ -21,8 +23,8 @@ router.put("/admin/:name", updateGames)
 
 //get all
 router.get("/", getGames)
-//update many 
-router.put("/update" , updateManyGames)
+//update many
+router.put("/update", updateManyGames)
 
 //get One
 router.get("/game/:id", getGame)
@@ -43,5 +45,9 @@ router.get("/released", sortGames)
 router.get("/rating", sortGames)
 
 router.get("/search", searchGames)
+
+router.get("/games-id", getGamesId)
+
+router.get("/games-like", getGameLike)
 
 export default router

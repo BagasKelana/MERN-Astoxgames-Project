@@ -3,6 +3,7 @@ import mongoose from "mongoose"
 const gameSchema = new mongoose.Schema({
 	about_game: String,
 	slug: String,
+	card_image: String,
 	name: {
 		type: String,
 		index: "text",
@@ -38,6 +39,9 @@ const gameSchema = new mongoose.Schema({
 	reviews_count: Number,
 	saturated_color: String,
 	dominant_color: String,
+	platforms: {
+		type: ["Mixed"],
+	},
 	system_requirements: {
 		type: ["Mixed"],
 	},

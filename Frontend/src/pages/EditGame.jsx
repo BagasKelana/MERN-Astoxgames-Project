@@ -1,7 +1,7 @@
 import Layout from "@/Layout/Layout"
-import DetailForm from "@/component/EditForms/DetailForm"
-import GeneralInformationForm from "@/component/EditForms/GeneralInformationForm"
-import ScreenshotForm from "@/component/EditForms/ScreenshotForm"
+import DetailForm from "@/component/EditGameForms/DetailForm"
+import GeneralInformationForm from "@/component/EditGameForms/GeneralInformationForm"
+import ScreenshotForm from "@/component/EditGameForms/ScreenshotForm"
 import useFetch from "@/hook/useFetch"
 import { createContext, useEffect, useRef, useState } from "react"
 

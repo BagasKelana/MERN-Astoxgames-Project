@@ -33,7 +33,7 @@ const Hero = () => {
                     width={1280}
                     height={720}
                     className=" h-full w-full rounded object-cover shadow shadow-black"
-                    src={data?.[srcMainImg].background_image}
+                    src={`/api${data?.[srcMainImg].card_image}`}
                     alt="IMG"
                 />
             </div>
@@ -41,7 +41,7 @@ const Hero = () => {
                 {data?.map((game, index) => {
                     return (
                         <SideImg
-                            src={game.background_image}
+                            src={`/api${game.card_image}`}
                             title={game.name}
                             key={game._id}
                             id={index}

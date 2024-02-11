@@ -1,5 +1,5 @@
 import Layout from "@/Layout/Layout"
-import TopGameCard from "@/component/Card/TopGameCard"
+import TopGameCard from "@/component/Card/GameCard"
 import { Link } from "react-router-dom"
 
 const UserProfile = () => {
